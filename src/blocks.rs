@@ -12,7 +12,7 @@ pub struct Block {
 }
 
 /// # Usage:
-/// This Transparency enum exist to mimic the classical minecraft behavior of semi-transparent blocks
+/// This ```Facing``` enum dictates what texture to render based on the direction
 /// # Format:
 /// ```
 /// pub enum Facing {
@@ -34,7 +34,7 @@ pub enum Facing {
     ZNegative
 }
 /// # Usage:
-/// This Transparency enum exist to mimic the classical minecraft behavior of semi-transparent blocks
+/// This ```Transparency``` enum exist to mimic the classical minecraft behavior of semi-transparent blocks
 /// # Format:
 /// ```
 /// pub enum Transparency {
@@ -49,7 +49,7 @@ pub enum Transparency {
 }
 
 /// # Usage:
-/// This Transparency enum exist to mimic the classical minecraft behavior of semi-transparent blocks that emmit light such as glowstone.
+/// This ```LightEmission``` enum exist to mimic the classical minecraft behavior of semi-transparent blocks that emmit light, such as glowstone.
 /// 
 /// It will later be used to make the light engine
 /// # Format:
@@ -65,7 +65,7 @@ pub enum LightEmission {
     Some(u8)
 }
 /// # Usage:
-/// This Transparency enum exist to mimic the redstone behavior
+/// This ```RedstonePowerLvl``` enum exist to mimic the redstone behavior
 /// # Format:
 /// ```
 /// pub enum RedstonePowerLvl {
@@ -80,7 +80,7 @@ pub enum RedstonePowerLvl {
 }
 
 /// # Usage:
-/// This enumerates all listed BlockTypes to minimise the data size
+/// This enumerates all listed ```BlockTypes``` to minimise the data size
 /// # Format:
 /// Just a list of Enums
 #[derive(Clone, Copy, PartialEq, Debug)]
@@ -91,6 +91,17 @@ pub enum BlockType {
     RedstoneBlock
 }
 
+/// # Usage:
+/// Merges all the data that can vary from block to block into one struct
+/// # Format:
+/// ```
+/// pub struct BlockResource {
+///     pub block_type: BlockType,
+///     pub transparency: Transparency,
+///     pub light_emission: LightEmission,
+///     pub redstone_power_lvl: RedstonePowerLvl,
+/// }
+/// ```
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub struct BlockResource {
     pub block_type: BlockType,

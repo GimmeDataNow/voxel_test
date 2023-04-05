@@ -1,6 +1,7 @@
+// crate modifiers
 #![allow(dead_code)]
 
-
+// foreign imports
 use bevy::{
     pbr::wireframe::{WireframeConfig, WireframePlugin},
     prelude::*,
@@ -9,11 +10,10 @@ use bevy::{
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_flycam::prelude::*;
 
+// 'self' imports
 mod blocks;
 #[path ="./chunks/chunks.rs"]
 pub mod chunks;
-
-#[allow(dead_code)]
 
 fn main() {
     App::new()

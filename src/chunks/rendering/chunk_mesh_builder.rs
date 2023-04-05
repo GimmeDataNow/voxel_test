@@ -1,10 +1,24 @@
+// foreign imports
 use bevy::prelude::Mesh;
 use bevy::render::mesh::PrimitiveTopology;
 use bevy::render::mesh::Indices;
 
+// 'self' imports
 #[path ="./rendering_const.rs"]
 mod rendering_const;
 
+/// # Description:
+/// The struct that contains all the necessary info to render the Mesh to the screen
+/// # Structure:
+/// ```
+/// pub struct ChunkMeshBuilder {
+///     vertices: Vec<[f32; 3]>,
+///     triangles: Vec<u32>,
+///     normals: Vec<[f32; 3]>,
+///     uvs: Vec<[f32; 2]>,
+///     face_count:u32
+/// }
+/// ```
 #[derive(Default)]
 pub struct ChunkMeshBuilder {
     vertices: Vec<[f32; 3]>,
@@ -32,7 +46,7 @@ impl ChunkMeshBuilder {
     }
 
     /// # Description:
-    /// Adds a new face of the entity to the mesh
+    /// Adds a new face of the entity to the ```Mesh```
     pub fn add_face(&mut self, coord: [u32; 3], face_index: u8) {
         for i in &rendering_const::VERTICES[face_index as usize] {
             self.vertices.push(Self::add_vec3(*i, coord));
@@ -55,7 +69,7 @@ impl ChunkMeshBuilder {
     }
 
     /// # Description:
-    /// Fills the rest of the Mesh struct based on available data. This makes the Mesh usable by bevy
+    /// Fills the rest of the ```Mesh``` based on available data. This makes the ```Mesh``` usable by bevy
     pub fn build(self) -> Mesh {
         let mut msh=Mesh::new(PrimitiveTopology::TriangleList);
         msh.insert_attribute(Mesh::ATTRIBUTE_POSITION, self.vertices);
