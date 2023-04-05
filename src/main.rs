@@ -54,7 +54,7 @@ fn setup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materials
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..default()
     });
-    let chunk = chunks::ChunkComp::new();
+    let chunk = chunks::ChunkComp::new_simple();
     let texture_handle = asset_server.load("textures/stone.png");
     let white_material = materials.add(StandardMaterial {
         base_color_texture: Some(texture_handle.clone()),
@@ -62,7 +62,7 @@ fn setup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materials
         ..Default::default()
     });
     commands.spawn(PbrBundle {
-        mesh: meshes.add(chunk.build_mesh()),
+        mesh: meshes.add(chunk.build_mesh_culling()),
         material: white_material.clone(),
         transform: Transform::from_xyz(0., 0., 0.),
         ..Default::default()

@@ -15,10 +15,15 @@ pub struct ChunkMeshBuilder {
 }
 
 impl ChunkMeshBuilder {
+    
+    /// # Description:
+    /// Builds an empty mesh based on the ```Self::default()``` function
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// # Description:
+    /// Makes the additon of the two arrays far easier to work with
     fn add_vec3(mut base: [f32; 3], addition: [u32; 3]) -> [f32; 3] {
         for i in 0..3 {
             base[i] += addition[i] as f32;
@@ -26,6 +31,8 @@ impl ChunkMeshBuilder {
         base
     }
 
+    /// # Description:
+    /// Adds a new face of the entity to the mesh
     pub fn add_face(&mut self, coord: [u32; 3], face_index: u8) {
         for i in &rendering_const::VERTICES[face_index as usize] {
             self.vertices.push(Self::add_vec3(*i, coord));
@@ -47,6 +54,8 @@ impl ChunkMeshBuilder {
         self.face_count+=1;
     }
 
+    /// # Description:
+    /// Fills the rest of the Mesh struct based on available data. This makes the Mesh usable by bevy
     pub fn build(self) -> Mesh {
         let mut msh=Mesh::new(PrimitiveTopology::TriangleList);
         msh.insert_attribute(Mesh::ATTRIBUTE_POSITION, self.vertices);

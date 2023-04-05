@@ -1,11 +1,11 @@
+// crate modifiers
 #![allow(dead_code)]
 
-
-// standard imports
-use crate::blocks::{self, Block, BlockType};
+// foreign imports
 use bevy::prelude::Mesh;
 
-// my imports
+// 'self' imports
+use crate::blocks::{self, Block, BlockType};
 #[path ="./rendering/rendering_const.rs"]
 mod rendering_const;
 
@@ -17,38 +17,64 @@ mod chunk_mesh_builder;
 const CHUNK_SIZE_HORIZONTAL: usize = 16;
 const CHUNK_HEIGHT: usize = 5; 
 
+/// # Description:
+/// This struct holds the ```Block``` struct and thus the base configuration of elements in a ```Chunk```. This struct later on needs to be saved to a file to allow for loading and saving worlds.
+/// # Structure:
+/// ```
+/// pub struct Chunk {
+///     blocks: [[[blocks::Block; CHUNK_SIZE_HORIZONTAL]; CHUNK_HEIGHT]; CHUNK_SIZE_HORIZONTAL],
+/// }
+/// ```
 pub struct Chunk {
     blocks: [[[blocks::Block; CHUNK_SIZE_HORIZONTAL]; CHUNK_HEIGHT]; CHUNK_SIZE_HORIZONTAL],
 }
-impl Chunk {
-    pub fn new(block: blocks::Block) -> Self {
-        Chunk { blocks: [[[block; CHUNK_SIZE_HORIZONTAL]; CHUNK_HEIGHT]; CHUNK_SIZE_HORIZONTAL] }
-    }
-    pub fn new_stone() -> Self {
-        Chunk { blocks: [[[Block::new(BlockType::Stone, blocks::Facing::XPositive); CHUNK_SIZE_HORIZONTAL]; CHUNK_HEIGHT]; CHUNK_SIZE_HORIZONTAL] }
-    }
-}
 
+/// # Description:
+/// This struct holds the ```Chunk``` struct along with the ```ChunkMeshBuilder``` struct. The ```ChunkMeshBuilder``` is later used to render the entity to the screen.
+/// The grouping of the ```Chunk``` and ```ChunkMeshBuilder``` makes access later on more convienient
+/// # Structure:
+/// ```
+/// pub struct ChunkComp {
+///     chunk: Chunk,
+///     chunk_mesh: chunk_mesh_builder::ChunkMeshBuilder,
+/// }
+/// ```
 pub struct ChunkComp {
     chunk: Chunk,
     chunk_mesh: chunk_mesh_builder::ChunkMeshBuilder,
 }
 
+impl Chunk {
+
+    /// # Description:
+    /// Takes in a ```Block``` struct and fills and entire chunk with said ```Block```
+    pub fn new_simple(block: blocks::Block) -> Self {
+        Chunk { blocks: [[[block; CHUNK_SIZE_HORIZONTAL]; CHUNK_HEIGHT]; CHUNK_SIZE_HORIZONTAL] }
+    }
+
+    /// # Description:
+    /// Does the same as ```new_simple(block: blocks::Block::new(BlockType::Air, Facing::XPositive))```
+    pub fn new_simple_stone() -> Self {
+        Chunk { blocks: [[[Block::new(BlockType::Stone, blocks::Facing::XPositive); CHUNK_SIZE_HORIZONTAL]; CHUNK_HEIGHT]; CHUNK_SIZE_HORIZONTAL] }
+    }
+}
+
 impl ChunkComp {
     
-    pub fn new() -> Self {
-        //let stone = Chunk::new_stone();
-        
-        // Trrain gen HERE
-
+    /// # Description:
+    /// Creates a simple ```Chunk``` filled to the brim with ```BlockType::Stone```. It also includes an empty ```ChunkMeshBuilder``` for further processing
+    pub fn new_simple() -> Self {        
         ChunkComp {
-            chunk: Chunk::new_stone(),
+            chunk: Chunk::new_simple_stone(),
             chunk_mesh: chunk_mesh_builder::ChunkMeshBuilder::new()
         }
     }
 
-
-    pub fn build_mesh(mut self) -> Mesh {
+    /// # Description:
+    /// Builds the mesh based on the ```Chunk``` data, ignoring any ```Blocks``` with ```Transparency::Opaque```.
+    /// 
+    /// This funcion uses basic culling to reduce the poly count.
+    pub fn build_mesh_culling(mut self) -> Mesh {
         for x in 0..CHUNK_SIZE_HORIZONTAL {
             for y in 0..CHUNK_HEIGHT {
                 for z in 0..CHUNK_SIZE_HORIZONTAL {
@@ -92,9 +118,40 @@ impl ChunkComp {
                     if z == CHUNK_SIZE_HORIZONTAL-1 || self.chunk.blocks[x][y][z + 1].get_base_properties().transparency == opaque {
                         self.chunk_mesh.add_face(coord, 4);
                     }
-                    //for i in 0..5 {
-                    //    self.mesh_builder.add_face(coord, i);
-                    //}
+                }
+            }
+        }
+
+        self.chunk_mesh.build()
+    }
+
+    /// # Description:
+    /// Builds the mesh based on the ```Chunk``` data, ignoring any ```Blocks``` with ```Transparency::Opaque```.
+    /// 
+    /// This funcion uses basic culling to reduce the poly count.
+    pub fn build_mesh_base(mut self) -> Mesh {
+        for x in 0..CHUNK_SIZE_HORIZONTAL {
+            for y in 0..CHUNK_HEIGHT {
+                for z in 0..CHUNK_SIZE_HORIZONTAL {
+
+                    // var due to repeated use
+                    let val = &mut self.chunk.blocks[x][y][z].get_base_properties().transparency;
+
+
+                    let coord = [x as u32, y as u32, z as u32];
+
+                    // makes the the code less verbose
+                    let opaque = blocks::Transparency::Opaque;
+
+                    // ignore any opaque cases
+                    // opaque blocks need to be handled seperately
+                    if *val == opaque {
+                        continue;
+                    }
+
+                    for i in 0..5 {
+                        self.chunk_mesh.add_face(coord, i);
+                    }
                 }
             }
         }

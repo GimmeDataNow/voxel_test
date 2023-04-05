@@ -11,6 +11,19 @@ pub struct Block {
     power_lvl: u8,
 }
 
+/// # Usage:
+/// This Transparency enum exist to mimic the classical minecraft behavior of semi-transparent blocks
+/// # Format:
+/// ```
+/// pub enum Facing {
+///     XPositive,
+///     XNegative,
+///     YPositive,
+///     YNegative,
+///     ZPositive,
+///     ZNegative
+/// }
+/// ```
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Facing {
     XPositive,
@@ -111,9 +124,6 @@ impl Block {
             face_direction, 
             power_lvl: 0
         } 
-    }
-    pub fn get_base_type(&self) -> BlockType {
-        self.block_type
     }
 
     /// # Usage:
