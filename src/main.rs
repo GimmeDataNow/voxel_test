@@ -8,6 +8,7 @@ use bevy::{
     render::{render_resource::WgpuFeatures, settings::WgpuSettings, RenderPlugin}
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use bevy_flycam::prelude::*;
 
 // 'self' imports
@@ -41,6 +42,8 @@ fn main() {
         .add_startup_system(setup)
         .add_startup_system(spawn_chunks)
         .add_system(wireframe_toggle)
+        .add_system(debug_distance)
+        .add_system(ui_example_system)
         .run();
 }
 
@@ -68,12 +71,12 @@ fn setup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materials
         unlit: false,
         ..Default::default()
     });
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(chunk.build_mesh_culling()),
-        material: white_material.clone(),
-        transform: Transform::from_xyz(0., 0., 0.),
-        ..Default::default()
-    });
+    //commands.spawn(PbrBundle {
+    //    mesh: meshes.add(chunk.build_mesh_culling()),
+    //    material: white_material.clone(),
+    //    transform: Transform::from_xyz(0., 0., 0.),
+    //    ..Default::default()
+    //});
 }
 fn wireframe_toggle(mut wireframe_config: ResMut<WireframeConfig>, input: Res<Input<KeyCode>>) {
     if input.just_pressed(KeyCode::L) {
@@ -81,8 +84,10 @@ fn wireframe_toggle(mut wireframe_config: ResMut<WireframeConfig>, input: Res<In
     }
 }
 fn spawn_chunks(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>, asset_server: Res<AssetServer>) {
-    for y in 0..20{
-        for x in 0..20{
+    let x = 0;
+    let y = 0;
+    //for y in 0..20{
+        //for x in 0..20{
             let chunk = chunks::ChunkComp::new_simple();
             let texture_handle = asset_server.load("textures/stone.png");
             let white_material = materials.add(StandardMaterial {
@@ -96,6 +101,19 @@ fn spawn_chunks(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut ma
                 transform: Transform::from_xyz((x * chunks::CHUNK_SIZE_HORIZONTAL) as f32, 0., (y * chunks::CHUNK_SIZE_HORIZONTAL) as f32),
                 ..Default::default()
             });
-        }
+        //}
+    //}
+}
+fn ui_example_system(query: Query<(&mut Transform, &Camera)>, mut contexts: EguiContexts) {
+    
+    egui::Window::new("Info").show(contexts.ctx_mut(), |ui| {
+        ui.label(query.single().0.translation.round().to_string());
+        ui.label(query.single().0.translation.distance(bevy::math::Vec3::ZERO).to_string());
+    });
+}
+fn debug_distance(query: Query<(&mut Transform, &Handle<Mesh>)>) {
+    for (transform, mesh) in query.iter(){
+        let diff = (transform.translation).abs();
+        //println!("balls {diff}")
     }
 }
