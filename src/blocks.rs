@@ -13,9 +13,10 @@ pub struct Block {
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Facing {
-    None,
     XPositive,
     XNegative,
+    YPositive,
+    YNegative,
     ZPositive,
     ZNegative
 }
@@ -131,38 +132,38 @@ mod tests {
 
     #[test]
     fn test_create() {
-        let test_instance = Block::new(BlockType::Air, Facing::None);
-        let test_instance2 = Block {block_type: BlockType::Air, face_direction: Facing::None, power_lvl: 0};
+        let test_instance = Block::new(BlockType::Air, Facing::XPositive);
+        let test_instance2 = Block {block_type: BlockType::Air, face_direction: Facing::XPositive, power_lvl: 0};
         assert_eq!(test_instance, test_instance2)
     }
 
     #[test]
     fn test_get_properties() {
-        let test_instance = Block::new(BlockType::Air, Facing::None);
+        let test_instance = Block::new(BlockType::Air, Facing::XPositive);
         let test_type = test_instance.get_base_properties();
         assert_eq!(BlockType::Air, test_type.block_type)
     }
     #[test]
     fn test_get_light_lvl_none() {
-        let test_instance = Block::new(BlockType::Air, Facing::None);
+        let test_instance = Block::new(BlockType::Air, Facing::XPositive);
         let test_type = test_instance.get_base_properties();
         assert_eq!(LightEmission::None, test_type.light_emission)
     }
     #[test]
     fn test_get_light_lvl_some() {
-        let test_instance = Block::new(BlockType::RedstoneBlock, Facing::None);
+        let test_instance = Block::new(BlockType::RedstoneBlock, Facing::XPositive);
         let test_type = test_instance.get_base_properties();
         assert_eq!(LightEmission::Some(7), test_type.light_emission)
     }
     #[test]
     fn test_get_redstone_power_lvl_none() {
-        let test_instance = Block::new(BlockType::Air, Facing::None);
+        let test_instance = Block::new(BlockType::Air, Facing::XPositive);
         let test_type = test_instance.get_base_properties();
         assert_eq!(RedstonePowerLvl::None, test_type.redstone_power_lvl)
     }
     #[test]
     fn test_get_redstone_power_lvl_some() {
-        let test_instance = Block::new(BlockType::RedstoneBlock, Facing::None);
+        let test_instance = Block::new(BlockType::RedstoneBlock, Facing::XPositive);
         let test_type = test_instance.get_base_properties();
         assert_eq!(RedstonePowerLvl::Some(15), test_type.redstone_power_lvl)
     }
