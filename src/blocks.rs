@@ -50,7 +50,6 @@ pub enum LightEmission {
     None,
     Some(u8)
 }
-
 /// # Usage:
 /// This Transparency enum exist to mimic the redstone behavior
 /// # Format:
@@ -80,10 +79,10 @@ pub enum BlockType {
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub struct BlockResource {
-    block_type: BlockType,
-    transparency: Transparency,
-    light_emission: LightEmission,
-    redstone_power_lvl: RedstonePowerLvl,
+    pub block_type: BlockType,
+    pub transparency: Transparency,
+    pub light_emission: LightEmission,
+    pub redstone_power_lvl: RedstonePowerLvl,
 }
 
 /// # Usage:
@@ -111,6 +110,9 @@ impl Block {
             face_direction, 
             power_lvl: 0
         } 
+    }
+    pub fn get_base_type(&self) -> BlockType {
+        self.block_type
     }
 
     /// # Usage:
