@@ -6,16 +6,17 @@ use bevy::prelude::Mesh;
 
 // 'self' imports
 use crate::blocks::{self, Block, BlockType};
-#[path ="./rendering/rendering_const.rs"]
-mod rendering_const;
+// #[path ="./rendering/rendering_const.rs"]
+// mod rendering_const;
 
 #[path ="./rendering/chunk_mesh_builder.rs"]
 mod chunk_mesh_builder;
+//use super::chunks::chunk_mesh_builder;
 
 
 //chunk constants
 pub const CHUNK_SIZE_HORIZONTAL: usize = 16;
-pub const CHUNK_HEIGHT: usize = 256; 
+pub const CHUNK_HEIGHT: usize = 5; 
 
 /// # Description:
 /// This struct holds the ```Block``` struct and thus the base configuration of elements in a ```Chunk```. This struct later on needs to be saved to a file to allow for loading and saving worlds.

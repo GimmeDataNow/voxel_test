@@ -4,8 +4,9 @@ use bevy::render::mesh::PrimitiveTopology;
 use bevy::render::mesh::Indices;
 
 // 'self' imports
-#[path ="./rendering_const.rs"]
-mod rendering_const;
+// #[path ="./rendering_const.rs"]
+// mod rendering_const;
+use crate::chunk_logic::rendering::rendering_const;
 
 /// # Description:
 /// The struct that contains all the necessary info to render the Mesh to the screen

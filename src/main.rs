@@ -3,18 +3,23 @@
 
 // foreign imports
 use bevy::{
-    pbr::wireframe::{WireframeConfig, WireframePlugin},
     prelude::*,
+    pbr::wireframe::{WireframeConfig, WireframePlugin},
     render::{render_resource::WgpuFeatures, settings::WgpuSettings, RenderPlugin}
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_egui::{egui, EguiContexts};
 use bevy_flycam::prelude::*;
+use chunk_logic::position_handling::to_chunk_coordinates;
+// use chunks::{chunk::ChunkComp, rendering::rendering_const};
 
 // 'self' imports
 mod blocks;
-#[path ="./chunks/chunks.rs"]
-pub mod chunks;
+// #[path ="./chunks/chunks.rs"]
+// pub mod chunks;
+// #[path ="./chunks/position_handling.rs"]
+// mod position_handling;
+mod chunk_logic;
 
 fn main() {
     App::new()
@@ -90,10 +95,10 @@ fn spawn_chunks(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut ma
 
 
     //let x = 0;
-    let y = 0;
+    // let y = 0;
     //for y in 0..20{
         for x in -5..5{
-            let chunk = chunks::ChunkComp::new_simple();
+            let chunk = chunk_logic::chunk::ChunkComp::new_simple();
             let white_material = materials.add(StandardMaterial {
                 base_color_texture: Some(texture_handle_stone.clone()),
                 unlit: false,
@@ -102,10 +107,10 @@ fn spawn_chunks(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut ma
             commands.spawn(PbrBundle {
                 mesh: meshes.add(chunk.build_mesh_culling()),
                 material: white_material.clone(),
-                transform: Transform::from_xyz((x * chunks::CHUNK_SIZE_HORIZONTAL as i32) as f32, 0., (1 * chunks::CHUNK_SIZE_HORIZONTAL) as f32),
+                transform: Transform::from_xyz((x * chunk_logic::chunk::CHUNK_SIZE_HORIZONTAL as i32) as f32, 0., (1 * chunk_logic::chunk::CHUNK_SIZE_HORIZONTAL) as f32),
                 ..Default::default()
             });
-            let chunk = chunks::ChunkComp::new_simple();
+            let chunk = chunk_logic::chunk::ChunkComp::new_simple();
             let white_material = materials.add(StandardMaterial {
                 base_color_texture: Some(texture_handle_dirt.clone()),
                 unlit: false,
@@ -114,7 +119,7 @@ fn spawn_chunks(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut ma
             commands.spawn(PbrBundle {
                 mesh: meshes.add(chunk.build_mesh_culling()),
                 material: white_material.clone(),
-                transform: Transform::from_xyz((x * chunks::CHUNK_SIZE_HORIZONTAL as i32) as f32, 0., (2 * chunks::CHUNK_SIZE_HORIZONTAL) as f32),
+                transform: Transform::from_xyz((x * chunk_logic::chunk::CHUNK_SIZE_HORIZONTAL as i32) as f32, 0., (2 * chunk_logic::chunk::CHUNK_SIZE_HORIZONTAL) as f32),
                 ..Default::default()
             });
         }
@@ -122,10 +127,9 @@ fn spawn_chunks(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut ma
 }
 fn ui_example_system(query: Query<(&mut Transform, &Camera)>, mut contexts: EguiContexts) {
     let translation = query.single().0.translation;
-    // ((a % b) + b) % b.
-    let offset_chunk_grid = chunks::CHUNK_SIZE_HORIZONTAL as f32;
-    let b = ((translation % offset_chunk_grid) + offset_chunk_grid) % offset_chunk_grid;
-    let c = translation;
+    let offset_chunk_grid = chunk_logic::chunk::CHUNK_SIZE_HORIZONTAL as f32;
+    let b = chunk_logic::position_handling::chunk_translation_fix((translation - (translation % offset_chunk_grid)) / offset_chunk_grid);
+    let c = translation % offset_chunk_grid;
     egui::Window::new("Info").show(contexts.ctx_mut(), |ui| {
         ui.label("Position:");
         ui.label(translation.round().to_string());
@@ -133,11 +137,14 @@ fn ui_example_system(query: Query<(&mut Transform, &Camera)>, mut contexts: Egui
         ui.label("Distance to Origin:");
         ui.label(translation.distance(bevy::math::Vec3::ZERO).to_string());
         ui.separator();
-        ui.label("In_Chunk coordinates:");
+        ui.label("Chunk coordinates:");
         ui.label(b.round().to_string());
         ui.separator();
-        ui.label("In_Chunk coordinates:");
+        ui.label("In-chunk coordinates:");
         ui.label(c.round().to_string());
+        ui.label("Chunk coordinates 2222:");
+        ui.label(to_chunk_coordinates(c).to_string());
+        ui.separator();
     });
 }
 
@@ -145,7 +152,7 @@ fn ui_example_system(query: Query<(&mut Transform, &Camera)>, mut contexts: Egui
 fn debug_distance(mut param_set: ParamSet<(Query<(&mut Transform, &Handle<Mesh>)>, Query<&mut Transform, &Camera>)>) {
 
     let cam_pos = param_set.p1().single().translation;
-    let chunk_center_offset = bevy::math::Vec3::new(-((chunks::CHUNK_SIZE_HORIZONTAL/2) as f32), 0.0, -((chunks::CHUNK_SIZE_HORIZONTAL/2) as f32));
+    let chunk_center_offset = bevy::math::Vec3::new(-((chunk_logic::chunk::CHUNK_SIZE_HORIZONTAL/2) as f32), 0.0, -((chunk_logic::chunk::CHUNK_SIZE_HORIZONTAL/2) as f32));
     for (transform, _mesh) in param_set.p0().iter(){
         
         let diff = (transform.translation - cam_pos).distance(cam_pos + chunk_center_offset);
@@ -156,7 +163,7 @@ fn debug_distance(mut param_set: ParamSet<(Query<(&mut Transform, &Handle<Mesh>)
 fn debug_player(mut param_set: ParamSet<(Query<(&mut Transform, &Handle<Mesh>)>, Query<&mut Transform, &Camera>)>) {
 
     let cam_pos = param_set.p1().single().translation;
-    let chunk_center_offset = bevy::math::Vec3::new(-((chunks::CHUNK_SIZE_HORIZONTAL/2) as f32), 0.0, -((chunks::CHUNK_SIZE_HORIZONTAL/2) as f32));
+    let chunk_center_offset = bevy::math::Vec3::new(-((chunk_logic::chunk::CHUNK_SIZE_HORIZONTAL/2) as f32), 0.0, -((chunk_logic::chunk::CHUNK_SIZE_HORIZONTAL/2) as f32));
     for (transform, _mesh) in param_set.p0().iter(){
         
         let diff = (transform.translation - cam_pos).distance(cam_pos + chunk_center_offset);
